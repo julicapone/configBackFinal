@@ -1,0 +1,58 @@
+spring:
+#  security:
+#    oauth2:
+#      client:
+#        provider:
+#          google:
+#            issuer-uri: https://accounts.google.com
+#        registration:
+#          google:
+#            client-id: 211216470959-10hvje57tahsc9r2sjban1fb0t5ke12i.apps.googleusercontent.com
+#            client-secret: 
+#            scope: openid,profile,email
+#            redirect-uri: http://localhost:8080/login/oauth2/code/google
+  zipkin:
+    base-url: http://localhost:9411/
+ #  base-url: http://zipkin:9411/
+    enabled: true
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: true
+      routes:
+        - id: catalog-service-route
+          uri: lb://catalog-service
+          predicates:
+            - Path=/catalog/**
+        - id: movie-service-route
+          uri: lb://movie-service
+          predicates:
+            - Path=/movies/**
+        - id: series-service-route
+          uri: lb://series-service
+          predicates:
+          - Path=/series/**
+ #     default-filters:
+ #       - OIDCTokenRelay
+server:
+  port: ${SERVER_PORT:8080}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+   #  defaultZone: http://service-registry/eureka
+
+management:
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'

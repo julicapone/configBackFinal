@@ -1,0 +1,63 @@
+spring:
+ # security:
+ #   oauth2:
+ #     resourceserver:
+ #       jwt:
+ #         issuer-uri: https://accounts.google.com
+  zipkin:
+    base-url: http://localhost:9411/
+ #  base-url: http://zipkin:9411/
+    enabled: true
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+#   host: rabbitmq
+    port: 5672
+  data:
+    mongodb:
+      host: localhost
+    # host: mongoCatalog
+      port: 27017
+      database: test
+queue:
+  serie:
+    name: SerieQueue
+  movie:
+    name: MovieQueue
+server:
+  port: ${PORT:8092}
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+   #  defaultZone: http://service-registry/eureka
+resilience4j:
+  circuitbreaker:
+    instances:
+      circuitGetCatalogByGenre:
+        slidingWindowType: COUNT_BASED
+        waitDurationInOpenState: 15000
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        registerHealthIndicator: true
+        allowHealthIndicatorToFail: false
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      circuitGetCatalogByGenre:
+        maxAttempts: 3
+        waitDuration: 1000
+        retryExceptions[0]: feign.FeignException$InternalServerError
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
